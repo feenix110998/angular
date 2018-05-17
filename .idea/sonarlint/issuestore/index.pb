@@ -1,0 +1,19 @@
+
+7
+pom.xml,4\4\442292b8a7efeabbe4cc176709b833b1792140ec
+^
+.src\main\angular-app\app\config\iapp.config.ts,1\7\17e7fb4c2f90920615172defb724bf336551b66f
+E
+src\main\angular.json,9\8\980dec9f4e387b24ebc54185283c7cafcf9fd3ef
+[
++src\main\e2e\src\home\home-page.e2e-spec.ts,b\1\b1f244f97ad17d856dfc05fd613179bcdcb41146
+i
+9src\main\e2e\src\heroes-list\heroes-list-page.e2e-spec.ts,f\a\fa85af334ea8c85bfd61dab5ac0f9d6e10bbc6df
+`
+0src\main\e2e\src\heroes-list\heroes-list-page.ts,5\a\5a75b7a97abd31e54ba96e6b7f90a2812c873566
+R
+"src\main\e2e\src\home\home-page.ts,d\6\d652046c4f399b3e3349c1a727fd7d1ce092b4c6
+O
+src\main\e2e\protractor.conf.js,0\4\0468ead9c12eadae1b8bac0131e1e878b1270481
+]
+-src\main\angular-app\app\config\app.config.ts,1\d\1db102b74b14e150a09d9e749099ddd1a8212d9c

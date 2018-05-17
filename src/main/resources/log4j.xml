@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!--  Log4j Configuration                                                  -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+<!--
+   | For more configuration information and examples see the Jakarta Log4j
+   | owebsite: http://jakarta.apache.org/log4j
+ -->
+
+<log4j:configuration debug="false">
+    <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="${jboss.server.log.dir}/dac.log"/>
+        <param name="Append" value="true"/>
+        <param name="datePattern" value=" '.' yyyy-MM-dd "/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <!-- The default pattern: Date Priority [Category] (Thread) Message\n -->
+            <param name="ConversionPattern" value="%d %-5p [%c] (%t) %m %X{username}%n"/>
+        </layout>
+    </appender>
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <errorHandler class="org.apache.log4j.helpers.OnlyOnceErrorHandler"/>
+        <param name="Target" value="System.out"/>
+        <param name="Threshold" value="DEBUG"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <!-- The default pattern: Date Priority [Category] Message\n -->
+            <param name="ConversionPattern" value="%d %-5p [%c] (%t) %m %X{username}%n"/>
+        </layout>
+    </appender>
+
+    <!--JDBC-->
+    <appender name="JDBC" class="org.apache.log4j.jdbcplus.JDBCAppender">
+
+        <param name="url" value="${jdbc.event.log.url}"/>
+        <param name="username" value="${jdbc.event.log.username}"/>
+        <param name="password" value="${jdbc.event.log.password}"/>
+        <param name="buffer" value="1"/>
+        <param name="commit" value="true"/>
+        <param name="dbclass" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+        <param name="quoteReplace" value="true"/>
+
+        <param name="sql"
+               value="exec uspInsertEventLogRecord 'dac', '@TIMESTAMP@', '@THREAD@', '@PRIO@', '@CAT@', '@MSG@', '@THROWABLE@', '@MDC:hostname@', '@MDC:userid@','@MDC:username@' "/>
+    </appender>
+
+    <appender name="Auditor" class="org.apache.log4j.jdbcplus.JDBCAppender">
+
+        <param name="url" value="${jdbc.audit.log.url}"/>
+        <param name="username" value="${jdbc.audit.log.username}"/>
+        <param name="password" value="${jdbc.audit.log.password}"/>
+        <param name="buffer" value="1"/>
+        <param name="commit" value="true"/>
+        <param name="dbclass" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+        <param name="quoteReplace" value="true"/>
+
+        <param name="sql"
+               value="exec InsertAudit 'dac', '@MDC:startdate@', '@MDC:enddate@', '@THREAD@', '@MDC:username@', '@MDC:hostname@', '@MDC:method@', '@MDC:exception@', '@MDC:downstreamresourcecall@', '@MDC:parameters@' "/>
+    </appender>
+
+    <appender name="ASYNC" class="org.apache.log4j.AsyncAppender">
+        <param name="BufferSize" value="500"/>
+        <param name="Blocking" value="false"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="JDBC"/>
+    </appender>
+
+    <appender name="ASYNCAUDIT" class="org.apache.log4j.AsyncAppender">
+        <param name="BufferSize" value="500"/>
+        <param name="Blocking" value="false"/>
+        <appender-ref ref="Auditor"/>
+    </appender>
+
+    <!-- ================ -->
+    <!-- Limit categories -->
+    <!-- ================ -->
+
+    <!-- Limit the org.apache category to INFO as its DEBUG is verbose -->
+    <category name="org.apache">
+        <priority value="INFO"/>
+    </category>
+
+    <!-- Limit the jacorb category to WARN as its INFO is verbose -->
+    <category name="jacorb">
+        <priority value="WARN"/>
+    </category>
+
+    <!-- Set the logging level of the JSF implementation that uses
+       | java.util.logging. The jdk logging levels can be controlled
+       | through the org.jboss.logging.log4j.JDKLevel class that
+       | in addition to the standard log4j levels it adds support for
+       | SEVERE, WARNING, CONFIG, FINE, FINER, FINEST
+    -->
+    <!-- Limit the org.jgroups category to WARN as its INFO is verbose -->
+    <category name="org.jgroups">
+        <priority value="WARN"/>
+    </category>
+
+    <!-- Limit the org.quartz category to INFO as its DEBUG is verbose -->
+    <category name="org.quartz">
+        <priority value="INFO"/>
+    </category>
+
+    <!-- Limit the com.sun category to INFO as its FINE is verbose -->
+    <category name="com.sun">
+        <priority value="INFO"/>
+    </category>
+
+    <!-- Limit the sun category to INFO as its FINE is verbose -->
+    <category name="sun">
+        <priority value="INFO"/>
+    </category>
+
+    <!-- Limit the javax.xml.bind category to INFO as its FINE is verbose -->
+    <category name="javax.xml.bind">
+        <priority value="INFO"/>
+    </category>
+
+    <!-- Limit JBoss categories
+    <category name="org.jboss">
+       <priority value="INFO"/>
+    </category>
+    -->
+
+    <!-- Limit the JSR77 categories -->
+    <category name="org.jboss.management">
+        <priority value="INFO"/>
+    </category>
+
+    <!-- Limit the verbose embedded jopr categories -->
+    <category name="org.rhq">
+        <priority value="WARN"/>
+    </category>
+
+    <!-- Limit the org.jboss.serial (jboss-serialization) to INFO as its DEBUG is verbose -->
+    <category name="org.jboss.serial">
+        <priority value="INFO"/>
+    </category>
+
+    <logger name="com.cox.audit" additivity="false">
+        <level value="${audit.log.level}"/>
+        <appender-ref ref="ASYNCAUDIT"/>
+    </logger>
+
+    <root>
+        <priority value="${application.log.level}"/>
+        <appender-ref ref="ASYNC"/>
+    </root>
+</log4j:configuration>
